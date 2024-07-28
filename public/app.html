@@ -39,12 +39,7 @@
 
         <form id="goalForm" class="bg-white p-6 rounded-lg shadow-lg mb-8">
             <h2 class="text-2xl font-pacifico text-pink-600 mb-4">Add New Goal</h2>
-            <div class="mb-4">
-                <label for="goalId" class="block text-pink-700 font-bold mb-2">Goal ID:</label>
-                <input type="text" id="goalId" name="goalId" required
-                    class="w-full px-3 py-2 text-pink-700 border rounded-lg focus:outline-none focus:border-pink-500"
-                    placeholder="Enter a unique goal ID...">
-            </div>
+
             <div class="mb-4">
                 <label for="task" class="block text-pink-700 font-bold mb-2">Task you don't like:</label>
                 <input type="text" id="task" name="task" required
@@ -260,7 +255,6 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             const goalData = {
-                id: formData.get('goalId'),
                 task: formData.get('task'),
                 reason: formData.get('reason'),
                 goal: formData.get('goal'),
