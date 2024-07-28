@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - The Passion Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #FFF0F5;
+        }
+
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+
+        .loader {
+            border-top-color: #F9A8D4;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @-webkit-keyframes spinner {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <header class="bg-pink-200 text-pink-800 p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-pacifico">The Passion Project</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-grow p-4 flex items-center justify-center">
+        <div id="loading" class="text-center">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 mx-auto">
+            </div>
+            <h2 class="text-xl font-semibold text-pink-600">Logging you in...</h2>
+            <p class="text-pink-700">Please wait while we process your request.</p>
+        </div>
+
+        <div id="error"
+            class="hidden text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert">
+            <strong class="font-bold">Oops!</strong>
+            <span class="block sm:inline" id="errorMessage"></span>
+        </div>
+    </main>
+
+    <footer class="bg-pink-200 text-pink-800 p-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 The Passion Project. Made with <i class="fas fa-heart text-pink-500"></i> for your dreams.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const authServer = 'https://auth.actionschema.com';
+        const redirectPage = 'app.html';
+        const clientId = 'mlhKAmZJDSqFGLNl';
+
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function redirectToAuthServer() {
+            window.location.href = `${authServer}/client/authorize?client_id=${clientId}`;
+        }
+
+        function exchangeCode(code) {
+            const formData = new FormData();
+            formData.append('code', code);
+
+            fetch(`${authServer}/client/exchangeCode`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    localStorage.setItem('authToken', data.access_token);
+                    window.location.href = redirectPage;
+                })
+                .catch(error => {
+                    showError(error.message);
+                });
+        }
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                exchangeCode(code);
+            } else if (localStorage.getItem('authToken')) {
+                window.location.href = redirectPage;
+            } else {
+                redirectToAuthServer();
+            }
+        });
+    </script>
+</body>
+
+</html>
